@@ -13,7 +13,7 @@ fn main() {
         std::process::exit(1);
     });
     match bundle::unpack(Path::new(&args[2]), &text) {
-        Ok(w) => println!("{} files", w.len()),
+        Ok(w) => println!("{} files, {} lines", w.len(), bundle::line_count(&bundle::parse(&text))),
         Err(e) => {
             eprintln!("{e}");
             std::process::exit(1);
