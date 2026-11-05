@@ -1,6 +1,7 @@
 //! Unpacks a bundle file: a text format where each entry is a header line
 //! `== <path>` followed by the file's lines, written below a target directory.
 
+use std::collections::HashSet;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -48,9 +49,16 @@ pub fn target(root: &Path, entry: &str) -> io::Result<PathBuf> {
 /// Writes every entry of `text` below `root` and returns the paths written.
 pub fn unpack(root: &Path, text: &str) -> io::Result<Vec<PathBuf>> {
     let mut written = Vec::new();
+    let mut seen = HashSet::new();
     for e in parse(text) {
         let named = |err: io::Error| io::Error::new(err.kind(), format!("{}: {err}", e.path));
         let p = target(root, &e.path).map_err(named)?;
+        if !seen.insert(p.clone()) {
+            return Err(named(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "duplicate entry",
+            )));
+        }
         if let Some(dir) = p.parent() {
             fs::create_dir_all(dir).map_err(named)?;
         }
