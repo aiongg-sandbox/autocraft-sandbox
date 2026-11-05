@@ -5,7 +5,7 @@ use std::path::Path;
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
-        eprintln!("usage: bundle <file> <dir>");
+        eprintln!("usage: bundle <bundle-file> <out-dir>");
         std::process::exit(2);
     }
     let text = std::fs::read_to_string(&args[1]).unwrap_or_else(|e| {
@@ -15,7 +15,7 @@ fn main() {
     match bundle::unpack(Path::new(&args[2]), &text) {
         Ok(w) => println!("{} files, {} lines", w.len(), bundle::line_count(&bundle::parse(&text))),
         Err(e) => {
-            eprintln!("{e}");
+            eprintln!("error: {e}");
             std::process::exit(1);
         }
     }
