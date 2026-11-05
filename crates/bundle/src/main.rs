@@ -5,7 +5,8 @@ use std::path::Path;
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
-        eprintln!("usage: bundle <file> <dir>");
+        let prog = args.first().map(String::as_str).unwrap_or("bundle");
+        eprintln!("usage: {prog} <file> <dir>");
         std::process::exit(2);
     }
     let text = std::fs::read_to_string(&args[1]).unwrap_or_else(|e| {
