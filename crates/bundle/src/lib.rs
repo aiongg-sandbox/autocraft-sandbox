@@ -48,6 +48,12 @@ pub fn target(root: &Path, entry: &str) -> io::Result<PathBuf> {
 
 /// Writes every entry of `text` below `root` and returns the paths written.
 pub fn unpack(root: &Path, text: &str) -> io::Result<Vec<PathBuf>> {
+    if let Some(line) = text.lines().next().filter(|l| !l.starts_with("== ")) {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!("line 1: text before the first header: {line}"),
+        ));
+    }
     let mut written = Vec::new();
     let mut seen = HashSet::new();
     for e in parse(text) {
