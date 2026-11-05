@@ -49,6 +49,10 @@ pub fn target(root: &Path, entry: &str) -> io::Result<PathBuf> {
 pub fn unpack(root: &Path, text: &str) -> io::Result<Vec<PathBuf>> {
     let mut written = Vec::new();
     for e in parse(text) {
+        // An entry with no lines is a placeholder in hand-written bundles; it writes nothing.
+        if e.body.is_empty() {
+            continue;
+        }
         let named = |err: io::Error| io::Error::new(err.kind(), format!("{}: {err}", e.path));
         let p = target(root, &e.path).map_err(named)?;
         if let Some(dir) = p.parent() {
