@@ -1,4 +1,4 @@
-//! `bundle <file> <dir>`: unpacks a bundle file into a directory.
+//! `bundle <bundle-file> <out-dir>`: unpacks a bundle file into a directory.
 
 use std::path::Path;
 
@@ -10,11 +10,11 @@ fn main() {
             .map(String::as_str)
             .filter(|s| !s.is_empty())
             .unwrap_or("bundle");
-        eprintln!("usage: {prog} <file> <dir>");
+        eprintln!("usage: {prog} <bundle-file> <out-dir>");
         std::process::exit(2);
     }
     let text = std::fs::read_to_string(&args[1]).unwrap_or_else(|e| {
-        eprintln!("{}: {e}", args[1]);
+        eprintln!("error: {}: {e}", args[1]);
         std::process::exit(1);
     });
     match bundle::unpack(Path::new(&args[2]), &text) {
@@ -24,7 +24,7 @@ fn main() {
             bundle::line_count(&bundle::parse(&text))
         ),
         Err(e) => {
-            eprintln!("{e}");
+            eprintln!("error: {e}");
             std::process::exit(1);
         }
     }
