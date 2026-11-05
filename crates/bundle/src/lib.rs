@@ -44,7 +44,7 @@ pub fn target(root: &Path, entry: &str) -> io::Result<PathBuf> {
 pub fn unpack(root: &Path, text: &str) -> io::Result<Vec<PathBuf>> {
     let mut written = Vec::new();
     for e in parse(text) {
-        let named = |err: io::Error| io::Error::new(err.kind(), format!("{}: {err}", root.display()));
+        let named = |err: io::Error| io::Error::new(err.kind(), format!("{}: {err}", e.path));
         let p = target(root, &e.path).map_err(named)?;
         if let Some(dir) = p.parent() {
             fs::create_dir_all(dir).map_err(named)?;
