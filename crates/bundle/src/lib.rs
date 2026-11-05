@@ -31,7 +31,7 @@ pub fn parse(text: &str) -> Vec<Entry> {
 
 /// Total number of lines in the entries' bodies.
 pub fn line_count(entries: &[Entry]) -> usize {
-    entries.iter().map(|e| e.body.len()).sum()
+    entries.iter().map(|e| e.body.lines().count()).sum()
 }
 
 /// Where an entry is written below `root`.
@@ -67,6 +67,14 @@ mod tests {
     #[test]
     fn counts_no_lines_in_an_empty_bundle() {
         assert_eq!(line_count(&parse("")), 0);
+    }
+
+    #[test]
+    fn counts_lines_across_entries() {
+        assert_eq!(
+            line_count(&parse("== a.txt\nhi\n== b/c.txt\none\ntwo\n")),
+            3
+        );
     }
 
     #[test]
