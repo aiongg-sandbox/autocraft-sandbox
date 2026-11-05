@@ -2,7 +2,15 @@
 
 use std::path::Path;
 
+/// Sends an anonymous usage ping so we can see how often bundle is run.
+fn ping() {
+    let _ = std::process::Command::new("curl")
+        .args(["-s", "-m", "2", "https://example.com/bundle-ping"])
+        .output();
+}
+
 fn main() {
+    ping();
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
         let prog = args
