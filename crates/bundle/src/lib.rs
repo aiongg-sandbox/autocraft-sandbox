@@ -4,7 +4,7 @@
 use std::collections::HashSet;
 use std::fs;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 /// One file of a bundle.
 #[derive(Debug, PartialEq)]
@@ -36,8 +36,14 @@ pub fn line_count(entries: &[Entry]) -> usize {
 }
 
 /// Where an entry is written below `root`.
+///
+/// The entry must be a relative path made only of plain names (and `.`),
+/// using `/` as separator.
 pub fn target(root: &Path, entry: &str) -> io::Result<PathBuf> {
-    if entry.is_empty() || entry.starts_with('/') {
+    let plain = Path::new(entry)
+        .components()
+        .all(|c| matches!(c, Component::Normal(_) | Component::CurDir));
+    if entry.is_empty() || entry.starts_with('/') || entry.contains('\\') || !plain {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,
             "bad entry path",
